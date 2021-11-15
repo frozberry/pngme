@@ -17,6 +17,24 @@ pub struct Chunk {
 }
 
 impl Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Result<Chunk> {
+        let length_bytes: [u8; 4] = (data.len() as u32).to_be_bytes();
+        let chunk_type_bytes = chunk_type.bytes();
+
+        let crc_check = [&chunk_type_bytes, data.as_slice()].concat();
+        let crc_bytes = checksum_ieee(crc_check.as_slice()).to_be_bytes();
+
+        let bytes = [
+            &length_bytes,
+            &chunk_type_bytes,
+            data.as_slice(),
+            &crc_bytes,
+        ]
+        .concat();
+
+        Chunk::try_from(bytes.as_slice())
+    }
+
     pub fn length(&self) -> u32 {
         self.length
     }
@@ -60,6 +78,11 @@ impl Chunk {
             .chain(data_bytes.iter().cloned())
             .chain(crc_bytes.iter().cloned())
             .collect()
+    }
+
+    pub fn calc_crc(chunk_type: [u8; 4], data: Vec<u8>) -> u32 {
+        let check_bytes = [&chunk_type, data.as_slice()].concat();
+        checksum_ieee(check_bytes.as_slice())
     }
 }
 
