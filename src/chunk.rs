@@ -1,9 +1,7 @@
-use crc;
 use crc::crc32::checksum_ieee;
 use std::convert::TryFrom;
 use std::fmt;
 use std::io::{BufReader, Read};
-use std::string::FromUtf8Error;
 
 use crate::chunk_type::ChunkType;
 use crate::{Error, Result};
@@ -79,11 +77,6 @@ impl Chunk {
             .chain(crc_bytes.iter().cloned())
             .collect()
     }
-
-    pub fn calc_crc(chunk_type: [u8; 4], data: Vec<u8>) -> u32 {
-        let check_bytes = [&chunk_type, data.as_slice()].concat();
-        checksum_ieee(check_bytes.as_slice())
-    }
 }
 
 impl TryFrom<&[u8]> for Chunk {
@@ -137,8 +130,6 @@ impl fmt::Display for Chunk {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::chunk_type::ChunkType;
-    use std::str::FromStr;
 
     fn testing_chunk() -> Chunk {
         let data_length: u32 = 42;

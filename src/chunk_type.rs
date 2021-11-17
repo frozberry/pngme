@@ -4,10 +4,12 @@ use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+
 pub struct ChunkType {
     bytes: [u8; 4],
 }
 
+#[allow(dead_code)]
 impl ChunkType {
     pub fn bytes(&self) -> [u8; 4] {
         self.bytes
@@ -96,10 +98,9 @@ impl FromStr for ChunkType {
             .map(|b| ChunkType::is_valid_byte(*b))
             .all(|b| b);
 
-        if is_alpha {
-            Ok(c)
-        } else {
-            Err("Invalid ChunkType".into())
+        match is_alpha {
+            true => Ok(c),
+            false => Err("Invalid ChunkType".into()),
         }
     }
 }

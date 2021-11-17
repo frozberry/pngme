@@ -5,8 +5,8 @@ use std::str::FromStr;
 use crate::args::{DecodeArgs, EncodeArgs, PrintArgs, RemoveArgs};
 use crate::chunk::Chunk;
 use crate::chunk_type::ChunkType;
-use crate::png::{self, Png};
-use crate::{Error, Result};
+use crate::png::Png;
+use crate::Result;
 
 pub fn encode(args: EncodeArgs) -> Result<()> {
     let bytes = fs::read(args.file_path.clone())?;
@@ -39,7 +39,8 @@ pub fn decode(args: DecodeArgs) -> Result<()> {
         }
     };
 
-    let message = String::from_utf8(chunk.data().to_vec())?;
+    // let message = String::from_utf8(chunkdata().to_vec())?;
+    let message = chunk.data_as_string()?;
     println!("{}", message);
 
     Ok(())
@@ -61,7 +62,7 @@ pub fn remove(args: RemoveArgs) -> Result<()> {
 }
 
 pub fn print_chunks(args: PrintArgs) -> Result<()> {
-    let bytes = fs::read(args.file_path.clone())?;
+    let bytes = fs::read(args.file_path)?;
     let png = Png::try_from(bytes.as_slice())?;
 
     println!("{:?}", png.chunks());

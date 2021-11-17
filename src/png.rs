@@ -1,9 +1,6 @@
-use crc::crc32::checksum_ieee;
 use std::convert::TryFrom;
 use std::fmt;
-use std::fs;
 use std::io::{BufReader, Read};
-use std::path::Path;
 use std::str::FromStr;
 use std::vec;
 
@@ -49,6 +46,8 @@ impl Png {
 
         Ok(removed)
     }
+
+    #[allow(dead_code)]
 
     pub fn header(&self) -> &[u8; 8] {
         &self.header
@@ -100,7 +99,7 @@ impl TryFrom<&[u8]> for Png {
 
         let mut chunks: Vec<Chunk> = Vec::new();
 
-        while reader.buffer().len() > 0 {
+        while !reader.buffer().is_empty() {
             let mut length_buffer: [u8; 4] = [0; 4];
             reader.read_exact(&mut length_buffer)?;
             let length = u32::from_be_bytes(length_buffer);
@@ -130,10 +129,9 @@ impl fmt::Display for Png {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::chunk::{self, Chunk};
+    use crate::chunk::Chunk;
     use crate::chunk_type::ChunkType;
     use std::convert::TryFrom;
-    use std::str::FromStr;
 
     fn testing_chunks() -> Vec<Chunk> {
         let mut chunks = Vec::new();
@@ -151,8 +149,6 @@ mod tests {
     }
 
     fn chunk_from_strings(chunk_type: &str, data: &str) -> Result<Chunk> {
-        use std::str::FromStr;
-
         let chunk_type = ChunkType::from_str(chunk_type)?;
         let data: Vec<u8> = data.bytes().collect();
 

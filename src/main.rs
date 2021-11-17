@@ -6,7 +6,6 @@ mod png;
 
 use args::PngMeArgs;
 use clap::Parser;
-use png::Png;
 
 pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
